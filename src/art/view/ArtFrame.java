@@ -16,6 +16,6 @@ public class ArtFrame extends JFrame
 	
 	private void setupFrame()
 	{
-		
+		this.setVisible(true);
 	}
 }
