@@ -1,9 +1,7 @@
 package art.view;
 
 import art.controller.ArtController;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+
 import java.awt.event.*;
 import java.util.Hashtable;
 import java.awt.*;
@@ -16,8 +14,8 @@ public class ArtPanel extends JPanel
 	private DrawingPanel canvas;
 	private JPanel colorPanel;
 	private JPanel menuPanel;
-	private JScorllPane canvasPane;
-	private SpringLayout applayout;
+	private JScrollPane canvasPane;
+	private SpringLayout appLayout;
 	private JSlider widthSlider;
 	private JButton redButton;
 	private JButton blueButton;
@@ -54,11 +52,14 @@ public class ArtPanel extends JPanel
 		colorPanel = new JPanel(new GridLayout(0, 1));
 		menuPanel = new JPanel(new GridLayout(0, 1));
 
+		canvasPane = new JScrollPane();
+		
 		setupMenuPanel();
 		setupPanel();
 		setupLayout();
 		setupListeners();
 		setupScrollPane();
+		setupSlider();
 	}
 
 	private void setupSlider()
@@ -73,11 +74,6 @@ public class ArtPanel extends JPanel
 		widthSlider.setPaintTicks(true);
 		widthSlider.setPaintLabels(true);
 		widthSlider.setValue((MAXIMUM_LINE + MINIMUM_LINE) / 2);
-	}
-
-	private void setupMenuPanels()
-	{
-
 	}
 
 	private void setupMenuPanel()
@@ -120,7 +116,19 @@ public class ArtPanel extends JPanel
 
 	private void setupLayout()
 	{
-
+		appLayout.putConstraint(SpringLayout.NORTH, colorPanel, 0, SpringLayout.NORTH, canvasPane);
+		appLayout.putConstraint(SpringLayout.SOUTH, colorPanel, 0, SpringLayout.SOUTH, canvasPane);
+		appLayout.putConstraint(SpringLayout.WEST, colorPanel, 50, SpringLayout.EAST, canvasPane);
+		appLayout.putConstraint(SpringLayout.EAST, colorPanel, 0, SpringLayout.WEST, menuPanel);
+				
+		appLayout.putConstraint(SpringLayout.WEST, menuPanel, 200, SpringLayout.EAST, canvasPane);
+		appLayout.putConstraint(SpringLayout.SOUTH, menuPanel, 0, SpringLayout.SOUTH, canvasPane);
+		appLayout.putConstraint(SpringLayout.EAST, menuPanel, -50, SpringLayout.EAST, this);
+		appLayout.putConstraint(SpringLayout.NORTH, menuPanel, 0, SpringLayout.NORTH, canvasPane);
+					
+		appLayout.putConstraint(SpringLayout.NORTH, canvasPane, 25, SpringLayout.NORTH, this);
+		appLayout.putConstraint(SpringLayout.WEST, canvasPane, 50, SpringLayout.WEST, this);
+		appLayout.putConstraint(SpringLayout.SOUTH, canvasPane, -50, SpringLayout.SOUTH, this);
 	}
 
 	private void setupListeners()
@@ -154,12 +162,12 @@ public class ArtPanel extends JPanel
 					
 				});
 		
-		canvas.addMouseMotionListener(new MousMotionListener()
+		canvasPane.addMouseMotionListener(new MouseMotionListener()
 				{
 				
 				public void mouseDragged(MouseEvent e)
 				{
-				
+				canvas.drawLine(e.getX(), e.getY(), widthSlider.getValue());
 				}
 				
 				public void mouseMoved(MouseEvent e)
@@ -169,5 +177,16 @@ public class ArtPanel extends JPanel
 				
 				});
 		
+		saveButton.addActionListener(new ActionListener()
+				{
+				public void actionPerformed(ActionEvent click)
+				{
+					canvas.saveImage();
+				}
+				});
+//		loadButton.addActionListener(new ActionListener();
+//		{
+			
+//		}
 	}
 }

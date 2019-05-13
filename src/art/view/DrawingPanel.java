@@ -4,11 +4,13 @@ import javax.swing.JPanel;
 import art.controller.ArtController;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 public class DrawingPanel extends JPanel
 {
@@ -103,5 +105,69 @@ public class DrawingPanel extends JPanel
 		repaint();
 	}
 	
+	public void drawLine(int currentX, int currentY, int width)
+	{
+		Graphics2D current = currentCanvas.createGraphics();
+		current.setColor(currentColor);
+		current.setStroke(new BasicStroke(width));
+		if (previousX ==  Integer.MIN_VALUE)
+		{
+			current.drawLine(currentX, currentY, currentX, currentY);
+		}
+		else
+		{
+			current.drawLine(previousX, previousY, currentX, currentY);
+		}
+		previousX = currentX;
+		previousY = currentY;
+		repaint();
+	}
 	
+	public void saveImage()
+	{
+		try
+		{
+			JFileChooser saveDialog = new JFileChooser();
+			saveDialog.showSaveDialog(this);
+			String savePath = saveDialog.getSelectedFile().getPath();
+			if (!savePath.endsWith(".png"))
+			{
+				savePath += ".png";
+			}
+			ImageIO.write(currentCanvas, "PNG", new File(savePath));
+		}
+		catch (IOException error)
+		{
+			app.handleErrors(error);
+		}
+		catch (NullPointerException badChoice)
+		{
+			app.handleErrors(badChoice);
+		}
+	}
+	
+	public void loadImage()
+	{
+		try
+		{
+			JFileChooser imageChooser = new JFileChooser();
+			imageChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			FileFilter imageFilter = new FileNameExtensionFilter("Image files only", ImageIO.getReaderFileSuffixes());
+			imageChooser.setFileFilter(imageFilter);
+			
+			int result = imageChooser.showOpenDialog(this);
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				File resultingFile  = imageChooser.getSelectedFile();
+				BufferedImage newCanvas = ImageIO.read(resultingFile);
+				currentCanvas = newCanvas;
+				this.setPreferredSize(new Dimension(currentCanvas.getWidth(),  currentCanvas.getHeight()));
+			}
+			repaint();
+		}
+		catch(IOException error)
+		{
+			app.handleErrors(error);
+		}
+	}
 }
